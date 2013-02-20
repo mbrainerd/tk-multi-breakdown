@@ -113,7 +113,7 @@ class SmallIconListItem(browser_widget.list_base.ListBase):
 
         # now try to cache it
         try:
-            self._app.tank.execute_hook("create_folder", path=os.path.dirname(path_to_cached_thumb))
+            self._app.ensure_folder_exists( os.path.dirname(path_to_cached_thumb))
             shutil.copy(temp_file, path_to_cached_thumb)
         except Exception, e:
             print "Could not cache thumbnail %s in %s. Error: %s" % (url, path_to_cached_thumb, e)
