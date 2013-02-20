@@ -88,13 +88,11 @@ class SmallIconListItem(browser_widget.list_base.ListBase):
         url = data["url"]
         
         # first check in our thumbnail cache
-        thumb_cache_root = os.path.join(self._app.tank.project_path, "tank", "cache", "thumbnails")
-        
         url_obj = urlparse.urlparse(url)
         url_path = url_obj.path
         path_chunks = url_path.split("/")
         
-        path_chunks.insert(0, thumb_cache_root)
+        path_chunks.insert(0, self._app.cache_location)
         # now have something like ["/studio/proj/tank/cache/thumbnails", "", "thumbs", "1", "2", "2.jpg"]
         
         # treat the list of path chunks as an arg list
@@ -113,8 +111,11 @@ class SmallIconListItem(browser_widget.list_base.ListBase):
 
         # now try to cache it
         try:
-            self._app.ensure_folder_exists( os.path.dirname(path_to_cached_thumb))
+            self._app.ensure_folder_exists(os.path.dirname(path_to_cached_thumb))
             shutil.copy(temp_file, path_to_cached_thumb)
+            # as a tmp file downloaded by urlretrieve, permissions are super strict
+            # modify the permissions of the file so it's writeable by others
+            os.chmod(path_to_cached_thumb, 0666)            
         except Exception, e:
             print "Could not cache thumbnail %s in %s. Error: %s" % (url, path_to_cached_thumb, e)
         
