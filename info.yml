@@ -16,7 +16,7 @@ configuration:
                      maya node name, the type key is a reference type and the path key is a full
                      path to the file currently being referenced.
         parameters: []
-        default_value: breakdown_scan_scene
+        default_value: "breakdown_scan_scene_{engine_name}"
 
     hook_multi_update:
         type: hook
@@ -25,7 +25,7 @@ configuration:
                      and path. The node_name and node_type are simply the same data that the 
                      scene scan hook returned, and the path value is the new path to load.                     
         parameters: [data]
-        default_value: breakdown_update
+        default_value: "breakdown_update_{engine_name}"
 
 # the Shotgun fields that this app needs in order to operate correctly
 requires_shotgun_fields:

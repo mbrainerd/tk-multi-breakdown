@@ -11,7 +11,7 @@ from tank.platform import Application
 import sys
 import os
 
-class MayaBreakdown(Application):
+class MultiBreakdown(Application):
     
     def init_app(self):
         """
