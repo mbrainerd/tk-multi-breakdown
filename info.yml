@@ -36,7 +36,7 @@ description: "Tools to see what in the scene is out of date."
 
 # Required minimum versions for this item to run
 requires_shotgun_version:
-requires_core_version: "v0.12.14"
+requires_core_version: "v0.13.22"
 requires_engine_version: "v0.2.0"
 
 # the engines that this app can operate in:
@@ -45,5 +45,5 @@ supported_engines:
 
 # the frameworks required to run this app
 frameworks:
-    - {"name": "tk-framework-widget", "version": "v0.1.4"}
+    - {"name": "tk-framework-widget", "version": "v0.1.13"}
     
