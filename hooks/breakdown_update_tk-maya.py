@@ -1,7 +1,14 @@
-"""
-Copyright (c) 2012 Shotgun Software, Inc
-----------------------------------------------------
+# Copyright (c) 2013 Shotgun Software Inc.
+# 
+# CONFIDENTIAL AND PROPRIETARY
+# 
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit 
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your 
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights 
+# not expressly granted therein are reserved by Shotgun Software Inc.
 
+"""
 Hook that contains the logic for updating a reference from one version to another.
 Coupled with the scene scanner hook - for each type of reference that the scanner
 hook can detect, a piece of upgrade logic should be provided in this file.
