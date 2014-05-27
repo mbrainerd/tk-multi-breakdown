@@ -26,7 +26,7 @@ class MultiBreakdown(Application):
 
         tk_multi_breakdown = self.import_module("tk_multi_breakdown")
         cb = lambda : tk_multi_breakdown.show_dialog(self)
-        self.engine.register_command("Scene Breakdown...", cb)
+        self.engine.register_command("Scene Breakdown...", cb, { "short_name": "breakdown" })
 
 
 
