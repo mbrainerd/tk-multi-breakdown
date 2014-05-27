@@ -35,11 +35,11 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
         
         items = []
 
-        # because maya is brittle when it comes to threads
-        # (even reading dag data WTF) have to use their 
-        # special hack. See
-        # http://download.autodesk.com/global/docs/maya2013/en_us/files/Python_Python_and_threading.htm
-        scene_objects = maya.utils.executeInMainThreadWithResult(self._app.execute_hook, "hook_scan_scene")
+        # perform the scene scanning in the main UI thread - 
+        # a lot of apps are 
+        app = tank.platform.current_bundle()
+        scene_objects = app.engine.execute_in_main_thread(self._app.execute_hook, "hook_scan_scene")
+
         # returns a list of dictionaries, each dict being like this:
         # {"node": node_name, "type": "reference", "path": maya_path}
         
@@ -62,8 +62,10 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
                     # now the fields are the raw breakdown of the path in the read node.
                     # could be bla.left.0002.exr, bla.%V.####.exr etc
                     # now normalize the fields SEQ and eye
+                    # todo: this needs to be generically supported in tank!
                     fields["SEQ"] = "FORMAT: %d"
                     fields["eye"] = "%V"
+                    
                     normalized_path = matching_template.apply_fields(fields)
                     
                     item = {}
@@ -215,7 +217,7 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
                     if sg_data.get(published_file_type_field):
                         details.append( self._make_row("Type", sg_data.get(published_file_type_field).get("name")))
 
-                    details.append( self._make_row("Maya Node", d["node_name"]))
+                    details.append( self._make_row("Node", d["node_name"]))
 
 
                 else:
@@ -231,7 +233,7 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
                         if k in relevant_fields:
                             details.append( self._make_row(k,v) )
                 
-                    details.append( self._make_row("Maya Node", d["node_name"]))
+                    details.append( self._make_row("Node", d["node_name"]))
                 
                 inner = "".join(details)
                 
