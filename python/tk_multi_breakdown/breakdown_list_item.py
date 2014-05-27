@@ -15,7 +15,7 @@ import shutil
 import sys
 import tank
 
-from PySide import QtCore, QtGui
+from tank.platform.qt import QtCore, QtGui
 
 browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
 shotgun_data = tank.platform.import_framework("tk-framework-shotgunutils", "shotgun_data")
