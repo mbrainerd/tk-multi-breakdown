@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'item.ui'
 #
-# Created: Thu Sep 20 14:58:05 2012
-#      by: pyside-uic 0.2.13 running on PySide 1.1.0
+#      by: pyside-uic 0.2.13 running on PySide 1.1.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from tank.platform.qt import QtCore, QtGui
+from sgtk.platform.qt import QtCore, QtGui
 
 class Ui_Item(object):
     def setupUi(self, Item):
