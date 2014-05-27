@@ -88,8 +88,8 @@ class AppDialog(QtGui.QWidget):
             new_path = x.data["template"].apply_fields(new_fields)
 
             d = {}
-            d["node_name"] = x.data["node_name"]
-            d["node_type"] = x.data["node_type"]
+            d["node"] = x.data["node_name"]
+            d["type"] = x.data["node_type"]
             d["path"] = new_path
 
             data.append(d)
