@@ -80,7 +80,13 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
                     items.append(item)
 
         # now now do a second pass on all the files that are valid to see if they are published
-        # note that we store (by convention) all things on a normalized form in SG.
+        # note that we store (by convention) all things on a normalized sequence form in SG, e.g
+        # all four-padded sequences are stored as '%04d' regardless if they have been published from
+        # houdini, maya, nuke etc.
+        #
+        # todo: find out if we need to make adjustments to ensure the current "normalized" sequence
+        # pattern logic works in DCCs which are using non-%04d conventions, e.g. houdini.
+        #
         valid_paths = [ x.get("path") for x in items ]
 
         # check if we have the path in the cache
