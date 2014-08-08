@@ -22,120 +22,32 @@ shotgun_data = tank.platform.import_framework("tk-framework-shotgunutils", "shot
 
 from .ui.item import Ui_Item
 
-class SmallIconListItem(browser_widget.list_base.ListBase):
-    # copied across ListItem class and changed the UI.
+class BreakdownListItem(browser_widget.ListItem):
+    """
+    Custom list widget for displaying the breakdown status in the list view
+    """
 
     def __init__(self, app, worker, parent=None):
-        browser_widget.list_base.ListBase.__init__(self, app, worker, parent)
-
-        # set up the UI
-        self.ui = Ui_Item()
-        self.ui.setupUi(self)
-        self._selected = False
-        self._worker = worker
-        self._worker_uid = None
-
-        # spinner
-        self._spin_icons = []
-        self._spin_icons.append(QtGui.QPixmap(":/res/thumb_loading_1.png"))
-        self._spin_icons.append(QtGui.QPixmap(":/res/thumb_loading_2.png"))
-        self._spin_icons.append(QtGui.QPixmap(":/res/thumb_loading_3.png"))
-        self._spin_icons.append(QtGui.QPixmap(":/res/thumb_loading_4.png"))
-
-        self._timer = QtCore.QTimer(self)
-        self._timer.timeout.connect( self._update_spinner )
-        self._current_spinner_index = 0
-
-    def supports_selection(self):
-        return True
-
-    def set_selected(self, status):
-        self._selected = status
-        if self._selected:
-            self.ui.background.setStyleSheet("background-color: #707070; border: none")
-        else:
-            self.ui.background.setStyleSheet("")
-
-    def is_selected(self):
-        return self._selected
-
-    def set_details(self, txt):
-        self.ui.details.setText(txt)
-
-    def get_details(self):
-        return self.ui.details.text()
-
-    def set_thumbnail(self, url):
-
-        if url.startswith("http"):
-            # start spinning
-            self._timer.start(100)
-
-            self._worker_uid = self._worker.queue_work(self._download_thumbnail, {"url": url})
-            self._worker.work_completed.connect(self._on_worker_task_complete)
-            self._worker.work_failure.connect( self._on_worker_failure)
-        else:
-            # assume url is a path on disk or resource
-            self.ui.thumbnail.setPixmap(QtGui.QPixmap(url))
-
-
-    ############################################################################################
-    # internal stuff
-
-    def _update_spinner(self):
         """
-        Animate spinner icon
+        Construction
         """
-        self.ui.thumbnail.setPixmap(self._spin_icons[self._current_spinner_index])
-        self._current_spinner_index += 1
-        if self._current_spinner_index == 4:
-            self._current_spinner_index = 0
+        browser_widget.ListItem.__init__(self, app, worker, parent)
 
-    def _download_thumbnail(self, data):
-        url = data["url"]
-        bundle = tank.platform.current_bundle()
-        path_to_cached_thumb = shotgun_data.ShotgunDataRetriever.download_thumbnail(url, bundle)
-        return {"thumb_path": path_to_cached_thumb }
-
-    def _on_worker_task_complete(self, uid, data):
-        if uid != self._worker_uid:
-            return
-
-        # stop spin
-        self._timer.stop()
-
-        # set thumbnail!
-        try:
-            path = data.get("thumb_path")
-            self.ui.thumbnail.setPixmap(QtGui.QPixmap(path))
-        except:
-            self.ui.thumbnail.setPixmap(QtGui.QPixmap(":/res/thumb_empty.png"))
-
-    def _on_worker_failure(self, uid, msg):
-
-        if self._worker_uid != uid:
-            # not our job. ignore
-            return
-
-        # stop spin
-        self._timer.stop()
-
-        # show error message
-        self._app.log_warning("Worker error: %s" % msg)
-
-
-
-
-
-
-class BreakdownListItem(SmallIconListItem):
-
-    def __init__(self, app, worker, parent=None):
-        SmallIconListItem.__init__(self, app, worker, parent)
         self._green_pixmap = QtGui.QPixmap(":/res/green_bullet.png")
         self._red_pixmap = QtGui.QPixmap(":/res/red_bullet.png")
         self._latest_version = None
         self._is_latest = None
+
+    def _setup_ui(self):
+        """
+        Setup the Qt UI.  Typically, this just instantiates the UI class
+        and calls its .setupUi(self) method.
+        
+        :returns:    The constructed UI
+        """
+        ui = Ui_Item()
+        ui.setupUi(self)
+        return ui
 
     def get_latest_version_number(self):
         # returns none if not yet determined
