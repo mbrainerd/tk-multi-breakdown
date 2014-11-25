@@ -60,13 +60,21 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
 
                     # now the fields are the raw breakdown of the path in the read node.
                     # could be bla.left.0002.exr, bla.%V.####.exr etc
-                    # now normalize the fields SEQ and eye
-                    # todo: this needs to be generically supported in tank!
-                    fields["SEQ"] = "FORMAT: %d"
+                    
+                    # remove all abstract fields from keys so that the default value will get used
+                    # when building a path from the template.  This is consistent with the utility
+                    # method 'register_publish'
+                    for key_name, key in matching_template.keys.iteritems():
+                        if key_name in fields and key.is_abstract:
+                            del(fields[key_name])
+
+                    # we also want to normalize the eye field (this should probably be an abstract field!)
                     fields["eye"] = "%V"
-
+                    
+                    # now build the normalized path that we can use to find corresponding Shotgun published 
+                    # files
                     normalized_path = matching_template.apply_fields(fields)
-
+                    
                     item = {}
                     item["path"] = normalized_path
                     item["node_name"] = node_name
