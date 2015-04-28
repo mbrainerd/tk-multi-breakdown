@@ -17,6 +17,8 @@ import tank
 
 from tank.platform.qt import QtCore, QtGui
 
+from . import breakdown
+
 browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
 
 from .breakdown_list_item import BreakdownListItem
@@ -27,119 +29,12 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
     def __init__(self, parent=None):
         browser_widget.BrowserWidget.__init__(self, parent)
 
-        # cache the resolved paths metadata - it doesn't change!
-        self._resolved_paths = {}
-
     def get_data(self, data):
-
-        items = []
-
-        # perform the scene scanning in the main UI thread -
-        # a lot of apps are
-        app = tank.platform.current_bundle()
-        scene_objects = app.engine.execute_in_main_thread(self._app.execute_hook_method, "hook_scene_operations", "scan_scene")
-
-        # returns a list of dictionaries, each dict being like this:
-        # {"node": node_name, "type": "reference", "path": maya_path}
-
-        # scan scene and add all tank nodes to list
-        for scene_object in scene_objects:
-
-            node_name = scene_object.get("node")
-            node_type = scene_object.get("type")
-            file_name = scene_object.get("path").replace("/", os.path.sep)
-
-            # see if this read node matches any path in the templates setup
-            matching_template = self._app.tank.template_from_path(file_name)
-
-            if matching_template:
-
-                # see if we have a version number
-                fields = matching_template.get_fields(file_name)
-                if "version" in fields:
-
-                    # now the fields are the raw breakdown of the path in the read node.
-                    # could be bla.left.0002.exr, bla.%V.####.exr etc
-                    
-                    # remove all abstract fields from keys so that the default value will get used
-                    # when building a path from the template.  This is consistent with the utility
-                    # method 'register_publish'
-                    for key_name, key in matching_template.keys.iteritems():
-                        if key_name in fields and key.is_abstract:
-                            del(fields[key_name])
-
-                    # we also want to normalize the eye field (this should probably be an abstract field!)
-                    fields["eye"] = "%V"
-                    
-                    # now build the normalized path that we can use to find corresponding Shotgun published 
-                    # files
-                    normalized_path = matching_template.apply_fields(fields)
-                    
-                    item = {}
-                    item["path"] = normalized_path
-                    item["node_name"] = node_name
-                    item["node_type"] = node_type
-                    item["template"] = matching_template
-                    item["fields"] = fields
-                    item["sg_data"] = None
-
-
-                    # store the normalized fields in dict
-                    items.append(item)
-
-        # now now do a second pass on all the files that are valid to see if they are published
-        # note that we store (by convention) all things on a normalized sequence form in SG, e.g
-        # all four-padded sequences are stored as '%04d' regardless if they have been published from
-        # houdini, maya, nuke etc.
-        #
-        # todo: find out if we need to make adjustments to ensure the current "normalized" sequence
-        # pattern logic works in DCCs which are using non-%04d conventions, e.g. houdini.
-        #
-        valid_paths = [ x.get("path") for x in items ]
-
-        # check if we have the path in the cache
-        paths_to_fetch = []
-        for p in valid_paths:
-            if p not in self._resolved_paths:
-                paths_to_fetch.append(p)
-            else:
-                # use cache data!
-                for item in items:
-                    if item.get("path") == p:
-                        item["sg_data"] = self._resolved_paths[p]
-
-
-        fields = ["entity",
-                  "entity.Asset.sg_asset_type", # grab asset type if it is an asset
-                  "code",
-                  "image",
-                  "name",
-                  "task",
-                  "version_number",
-                  ]
-
-        if tank.util.get_published_file_entity_type(self._app.tank) == "PublishedFile":
-            fields.append("published_file_type")
-        else:# == "TankPublishedFile"
-            fields.append("tank_type")
-
-        sg_data = tank.util.find_publish(self._app.tank, paths_to_fetch, fields=fields)
-
-        # process and cache shotgun items
-        for (path, sg_chunk) in sg_data.items():
-            # cache item
-            self._resolved_paths[path] = sg_chunk
-
-            # change type from valid -> publish
-            for item in items:
-                if item.get("path") == path:
-                    item["sg_data"] = sg_chunk
-
+        items = breakdown.get_breakdown_items()        
         return {"items": items, "show_red": data["show_red"], "show_green": data["show_green"] }
 
     def _make_row(self, first, second):
         return "<tr><td><b>%s</b>&nbsp;&nbsp;&nbsp;</td><td>%s</td></tr>" % (first, second)
-
 
     def process_result(self, result):
 

@@ -23,6 +23,7 @@ browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_
 shotgun_data = tank.platform.import_framework("tk-framework-shotgunutils", "shotgun_data")
 
 from .ui.item import Ui_Item
+from . import breakdown
 
 class BreakdownListItem(browser_widget.ListItem):
     """
@@ -98,9 +99,7 @@ class BreakdownListItem(browser_widget.ListItem):
         # set up the payload
         output = {}
 
-        ########################################################################
-        # stage 1: calculate the thumbnail
-
+        # First, calculate the thumbnail
         # see if we can download a thumbnail
         # thumbnail can be in any of the fields
         # entity.Asset.image
@@ -123,44 +122,8 @@ class BreakdownListItem(browser_widget.ListItem):
                 output["thumbnail"] = ":/res/no_thumb.png"
 
 
-
-        ########################################################################
-        # stage 2: calculate visibility
-        # check if this is the latest item
-
-        # note - have to do some tricks here to get sequences and stereo working
-        # need to fix this in Tank platform
-
-        # get all eyes, all frames and all versions
-        # potentially a HUGE glob, so may be really SUPER SLOW...
-        # todo: better support for sequence iterations
-        
-        # first, find all abstract (Sequence) keys from the template:
-        abstract_keys = set()
-        for key_name, key in self._template.keys.iteritems():
-            if key.is_abstract:
-                abstract_keys.add(key_name)
-
-        # skip keys are all abstract keys + 'version' & 'eye'
-        skip_keys = [k for k in abstract_keys] + ["version", "eye"]
-
-        # then find all files, skipping these keys
-        all_versions = self._app.tank.paths_from_template(self._template, 
-                                                          self._fields, 
-                                                          skip_keys = skip_keys)
-
-        # if we didn't find anything then something has gone wrong with our 
-        # logic as we should have at least one file so error out:
-        # TODO - this should be handled more cleanly!
-        if not all_versions:
-            raise TankError("Failed to find any files!")        
-        
-        # now look for the highest version number...
-        latest_version = 0
-        for ver in all_versions:
-            fields = self._template.get_fields(ver)
-            if fields["version"] > latest_version:
-                latest_version = fields["version"]
+        # first, get the latest available version for this item
+        latest_version = breakdown.compute_highest_version(self._template, self._fields)
 
         current_version = self._fields["version"]
         output["up_to_date"] = (latest_version == current_version)
