@@ -28,6 +28,14 @@ class MultiBreakdown(Application):
         self.engine.register_command("Scene Breakdown...", cb, { "short_name": "breakdown" })
 
 
+    @property
+    def context_change_allowed(self):
+        """
+        Specifies that context changes are allowed.
+        """
+        return True
+
+
     def show_breakdown_dialog(self):
         """
         Show the breakdown UI as a dialog.
