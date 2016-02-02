@@ -43,27 +43,6 @@ class BreakdownSceneOperations(Hook):
         """
 
         items = []
-        processed_alembic_nodes = []
-
-        # get a list of all alembic archive nodes
-        archive_nodes = hou.nodeType(hou.objNodeTypeCategory(),
-            "alembicarchive").instances()
-
-        for archive_node in archive_nodes:
-
-            file_parm = archive_node.parm("fileName")
-            file_path = os.path.normpath(file_parm.eval())
-
-            items.append({
-                "node": archive_node.path(),
-                "type": "alembicarchive",
-                "path": file_path,
-            }) 
-
-            child_alembic_nodes = [c.path() for c in archive_node.allSubChildren() 
-                if c.type().name() == "alembic"]
-
-            processed_alembic_nodes.extend(child_alembic_nodes)
 
         # get a list of all regular lembic nodes in the file
         alembic_nodes = hou.nodeType(hou.sopNodeTypeCategory(),
@@ -72,10 +51,6 @@ class BreakdownSceneOperations(Hook):
         # return an item for each alembic node found. the breakdown app will check
         # the paths of each looking for a template match and a newer version.
         for alembic_node in alembic_nodes:
-
-            # don't worry about alembic nodes inside archives
-            if alembic_node.path() in processed_alembic_nodes:
-                continue
 
             file_parm = alembic_node.parm("fileName")
             file_path = os.path.normpath(file_parm.eval())
@@ -119,19 +94,4 @@ class BreakdownSceneOperations(Hook):
                 engine.log_debug(
                     "Updating alembic node '%s' to: %s" % (node_path, file_path))
                 alembic_node.parm("fileName").set(file_path)
-
-            elif node_type == "alembicarchive":
-
-                archive_node = hou.node(node_path)
-                engine.log_debug(
-                    "Updating alembic archive node '%s' to: %s" % (node_path, file_path))
-
-                archive_node.parm("fileName").set(file_path)
-
-                # update the path for all of the child alembic nodes
-                child_alembic_nodes = [c for c in archive_node.allSubChildren() 
-                    if c.type().name() in ["alembic", "alembicxform"]]
-
-                for child_alembic_node in child_alembic_nodes:
-                    child_alembic_node.parm("fileName").set(file_path)
 
