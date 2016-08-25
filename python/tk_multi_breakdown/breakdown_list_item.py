@@ -20,7 +20,6 @@ from tank import TankError
 from tank.platform.qt import QtCore, QtGui
 
 browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
-shotgun_data = tank.platform.import_framework("tk-framework-shotgunutils", "shotgun_data")
 
 from .ui.item import Ui_Item
 from . import breakdown
