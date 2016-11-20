@@ -23,3 +23,10 @@ at the location of this app:
 cd /path/to/tk-core/tests
 ./run_tests.sh --test-root=/path/to/tk-multi-breakdown/tests
 ```
+
+alternatively, to run it directly:
+
+```
+cd /path/to/tk-multi-breakdown
+/path/to/tk-core/tests/run_tests.sh --test-root=./tests
+```
