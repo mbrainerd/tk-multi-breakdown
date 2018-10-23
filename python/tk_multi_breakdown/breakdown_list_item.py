@@ -158,7 +158,7 @@ class BreakdownListItem(browser_widget.ListItem):
 
         # set thumbnail
         if data.get("thumbnail"):
-            self.ui.thumbnail.setPixmap(QtGui.QPixmap(data.get("thumbnail")))
+            self.ui.thumbnail.setPixmap(QtGui.QPixmap(QtGui.QImage(data.get("thumbnail"))))
 
         # set light - red or green
         if data["up_to_date"]:
