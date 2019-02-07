@@ -22,6 +22,14 @@ configuration:
                      path to the file currently being referenced.
         default_value: "{self}/{engine_name}_scene_operations.py"
 
+    hook_get_version_number:
+        type: hook
+        description: Perform a scan on disk to determine the highest version.
+                     Given a template and some fields, return the highest version number found on disk.
+                     The template key containing the version number is assumed to be named {version}.
+        default_value: "{self}/get_version_number.py"
+
+
 
 # the Shotgun fields that this app needs in order to operate correctly
 requires_shotgun_fields:

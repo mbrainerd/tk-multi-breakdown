@@ -8,8 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from breakdown import get_breakdown_items, compute_highest_version
-
 def show_dialog(app):
     # defer imports so that the app works gracefully in batch modes
     from .dialog import AppDialog
