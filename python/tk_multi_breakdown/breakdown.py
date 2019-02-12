@@ -160,6 +160,8 @@ def get_breakdown_items():
               "version_number",
               "project"
               ]
+    # add the additional publish fields to query.
+    fields = fields + app.get_setting('additional_publish_fields')
 
     if tank.util.get_published_file_entity_type(app.tank) == "PublishedFile":
         fields.append("published_file_type")
