@@ -92,6 +92,28 @@ class AppDialog(QtGui.QWidget):
             d["type"] = x.data["node_type"]
             d["path"] = new_path
 
+            # we need to query the additional publish fields for the new published file
+            # so we can update those attributes on the node as well
+            additional_publish_fields = self._app.get_setting("additional_publish_fields")
+            if additional_publish_fields:
+                # add the additional publish fields to query.
+                publish_fields = additional_publish_fields
+
+                if tank.util.get_published_file_entity_type(self._app.tank) == "PublishedFile":
+                    publish_fields.append("published_file_type")
+                else:  # == "TankPublishedFile"
+                    publish_fields.append("tank_type")
+
+                publish_data = tank.util.find_publish(self._app.tank, [new_path], fields=publish_fields)
+                sg_data = publish_data.get(new_path)
+
+                if sg_data:
+                    for publish_field in additional_publish_fields:
+                        if publish_field in sg_data:
+                            if "sg_data" not in d:
+                                d["sg_data"] = dict()
+                            d["sg_data"][publish_field] = sg_data[publish_field]
+
             data.append(d)
 
         # call out to hook
