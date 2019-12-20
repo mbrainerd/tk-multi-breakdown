@@ -119,7 +119,10 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
                     # see if this publish is associated with an entity
                     linked_entity = sg_data.get("entity")
                     if linked_entity:
-                        details.append( self._make_row(linked_entity["type"], linked_entity["name"]) )
+                        display_name = tank.util.get_entity_type_display_name(tank.platform.current_engine().tank,
+                                                                              linked_entity["type"])
+    
+                        details.append(self._make_row(display_name, linked_entity["name"]))
 
                     # does it have a tank type ?
                     if sg_data.get(published_file_type_field):
