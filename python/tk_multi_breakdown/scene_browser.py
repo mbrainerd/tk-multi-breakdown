@@ -20,6 +20,7 @@ from tank.platform.qt import QtCore, QtGui
 from . import breakdown
 
 browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
+shotgun_globals = tank.platform.import_framework("tk-framework-shotgunutils", "shotgun_globals")
 
 from .breakdown_list_item import BreakdownListItem
 
@@ -119,8 +120,7 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
                     # see if this publish is associated with an entity
                     linked_entity = sg_data.get("entity")
                     if linked_entity:
-                        display_name = tank.util.get_entity_type_display_name(tank.platform.current_engine().tank,
-                                                                              linked_entity["type"])
+                        display_name = shotgun_globals.get_type_display_name(linked_entity["type"])
     
                         details.append(self._make_row(display_name, linked_entity["name"]))
 
