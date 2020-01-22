@@ -30,6 +30,13 @@ configuration:
             type: str
         allows_empty: True
         default_value: []
+    hook_get_version_number:
+        type: hook
+        description: Perform a scan on disk to determine the highest version.
+                     Given a template and some fields, return the highest version number found on disk.
+                     The template key containing the version number is assumed to be named {version}.
+        default_value: "{self}/get_version_number.py"
+
 
 
 # the Shotgun fields that this app needs in order to operate correctly
@@ -50,3 +57,4 @@ supported_engines:
 # the frameworks required to run this app
 frameworks:
     - {"name": "tk-framework-widget", "version": "v0.2.x"}
+    - {"name": "tk-framework-shotgunutils", "version": "v5.x.x", "minimum_version": "v5.2.1"}

@@ -44,7 +44,7 @@ class BreakdownListItem(browser_widget.ListItem):
         """
         Setup the Qt UI.  Typically, this just instantiates the UI class
         and calls its .setupUi(self) method.
-        
+
         :returns:    The constructed UI
         """
         ui = Ui_Item()
@@ -122,7 +122,8 @@ class BreakdownListItem(browser_widget.ListItem):
 
 
         # first, get the latest available version for this item
-        latest_version = breakdown.compute_highest_version(self._template, self._fields)
+        app = tank.platform.current_bundle()
+        latest_version = app.execute_hook("hook_get_version_number", template=self._template, curr_fields=self._fields)
 
         current_version = self._fields["version"]
         output["up_to_date"] = (latest_version == current_version)

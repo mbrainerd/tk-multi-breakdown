@@ -174,8 +174,7 @@ class MultiBreakdown(Application):
         :param fields: A complete set of fields for the template
         :returns: The highest version number found
         """
-        tk_multi_breakdown = self.import_module("tk_multi_breakdown")
-        return tk_multi_breakdown.compute_highest_version(template, fields)
+        return self.execute_hook("hook_get_version_number", template=template, curr_fields=fields)
         
         
     def update_item(self, node_type, node_name, template, fields):
