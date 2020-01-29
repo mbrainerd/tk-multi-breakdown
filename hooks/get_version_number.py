@@ -22,6 +22,9 @@ class GetVersionNumber(HookBaseClass):
     Given a template and some fields, return the highest version number found on disk.
     The template key containing the version number is assumed to be named {version}.
     """
+    # from sgtk.profiling import CProfileRunner
+    #
+    # @CProfileRunner(profiling_identifier="highest_version2")
     def execute(self, template, curr_fields, **kwargs):
         """
         Main hook entry point.
@@ -53,13 +56,16 @@ class GetVersionNumber(HookBaseClass):
         skip_keys = [k for k in abstract_keys] + [VERSION_KEY, "eye"]
 
         # then find all files, skipping these keys
-        all_versions = self.sgtk.paths_from_template(template, curr_fields, skip_keys=skip_keys)
+        all_versions = self.sgtk.abstract_paths_from_template(template, curr_fields, skip_keys=skip_keys)
 
         # if we didn't find anything then something has gone wrong with our
         # logic as we should have at least one file so error out:
         # TODO - this should be handled more cleanly!
         if not all_versions:
             raise TankError("Failed to find any files!")
+
+        print all_versions
+        print len(all_versions)
 
         # now look for the highest version number...
         highest_version = 0
