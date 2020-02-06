@@ -16,12 +16,14 @@ HookBaseClass = sgtk.get_hook_baseclass()
 # the template key we use to find the version number
 VERSION_KEY = "version"
 
+
 class GetVersionNumber(HookBaseClass):
     """
     Hook called to scan the disk and determine the highest version.
     Given a template and some fields, return the highest version number found on disk.
     The template key containing the version number is assumed to be named {version}.
     """
+
     def execute(self, template, curr_fields, **kwargs):
         """
         Main hook entry point.
@@ -53,7 +55,9 @@ class GetVersionNumber(HookBaseClass):
         skip_keys = [k for k in abstract_keys] + [VERSION_KEY, "eye"]
 
         # then find all files, skipping these keys
-        all_versions = self.sgtk.paths_from_template(template, curr_fields, skip_keys=skip_keys)
+        all_versions = self.sgtk.paths_from_template(
+            template, curr_fields, skip_keys=skip_keys
+        )
 
         # if we didn't find anything then something has gone wrong with our
         # logic as we should have at least one file so error out:

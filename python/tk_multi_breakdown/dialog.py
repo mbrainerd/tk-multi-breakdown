@@ -17,9 +17,8 @@ import threading
 from tank.platform.qt import QtCore, QtGui
 from .ui.dialog import Ui_Dialog
 
+
 class AppDialog(QtGui.QWidget):
-
-
     def __init__(self, app):
         QtGui.QWidget.__init__(self)
         self._app = app
@@ -41,7 +40,6 @@ class AppDialog(QtGui.QWidget):
         # load data from shotgun
         self.setup_scene_list()
 
-
     ########################################################################################
     # make sure we trap when the dialog is closed so that we can shut down
     # our threads. Nuke does not do proper cleanup on exit.
@@ -56,19 +54,20 @@ class AppDialog(QtGui.QWidget):
 
     def select_all_red(self):
         for x in self.ui.browser.get_items():
-            try: # hack - all items arent breakdown nodes
+            try:  # hack - all items arent breakdown nodes
                 if x.is_out_of_date() and not x.is_selected():
                     self.ui.browser.select(x)
             except:
                 pass
-
 
     def update_items(self):
 
         curr_selection = self.ui.browser.get_selected_items()
 
         if len(curr_selection) == 0:
-            QtGui.QMessageBox.information(self, "Please select", "Please select items to update!")
+            QtGui.QMessageBox.information(
+                self, "Please select", "Please select items to update!"
+            )
             return
 
         data = []
@@ -100,7 +99,6 @@ class AppDialog(QtGui.QWidget):
         # finally refresh the UI
         self.setup_scene_list()
 
-
     def setup_scene_list(self):
         self.ui.browser.clear()
 
@@ -123,6 +121,3 @@ class AppDialog(QtGui.QWidget):
             d["show_green"] = True
 
         self.ui.browser.load(d)
-
-
-

@@ -13,6 +13,7 @@ import maya.cmds as cmds
 import pymel.core as pm
 import os
 
+
 class BreakdownSceneOperations(Hook):
     """
     Breakdown operations for Maya.
@@ -50,7 +51,7 @@ class BreakdownSceneOperations(Hook):
             # get the path and make it platform dependent
             # (maya uses C:/style/paths)
             maya_path = x.path.replace("/", os.path.sep)
-            refs.append( {"node": node_name, "type": "reference", "path": maya_path})
+            refs.append({"node": node_name, "type": "reference", "path": maya_path})
 
         # now look at file texture nodes
         for file_node in cmds.ls(l=True, type="file"):
@@ -60,9 +61,11 @@ class BreakdownSceneOperations(Hook):
                 continue
 
             # get path and make it platform dependent (maya uses C:/style/paths)
-            path = cmds.getAttr("%s.fileTextureName" % file_node).replace("/", os.path.sep)
+            path = cmds.getAttr("%s.fileTextureName" % file_node).replace(
+                "/", os.path.sep
+            )
 
-            refs.append( {"node": file_node, "type": "file", "path": path})
+            refs.append({"node": file_node, "type": "file", "path": path})
 
         return refs
 
@@ -88,13 +91,16 @@ class BreakdownSceneOperations(Hook):
 
             if node_type == "reference":
                 # maya reference
-                engine.log_debug("Maya Reference %s: Updating to version %s" % (node, new_path))
+                engine.log_debug(
+                    "Maya Reference %s: Updating to version %s" % (node, new_path)
+                )
                 rn = pm.system.FileReference(node)
                 rn.replaceWith(new_path)
 
             elif node_type == "file":
                 # file texture node
-                engine.log_debug("File Texture %s: Updating to version %s" % (node, new_path))
+                engine.log_debug(
+                    "File Texture %s: Updating to version %s" % (node, new_path)
+                )
                 file_name = cmds.getAttr("%s.fileTextureName" % node)
                 cmds.setAttr("%s.fileTextureName" % node, new_path, type="string")
-

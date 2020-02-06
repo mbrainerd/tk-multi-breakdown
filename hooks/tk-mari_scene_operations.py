@@ -13,6 +13,7 @@ from sgtk import Hook, TankError
 
 import mari
 
+
 class MariSceneOperations(Hook):
     """
     Breakdown operations for Mari.
@@ -47,7 +48,7 @@ class MariSceneOperations(Hook):
         # find all geo in the current project using the engine utility method:
         mari_engine = self.parent.engine
         all_geo = mari_engine.list_geometry()
-        
+
         # now, for all geo, find all versions:
         found_versions = []
         for geo in [g.get("geo") for g in all_geo]:
@@ -57,12 +58,16 @@ class MariSceneOperations(Hook):
 
             # now find the publish path for the current version:
             current_version = geo.currentVersion()
-            for geo_version, path in [(v["geo_version"], v.get("path")) for v in all_geo_versions]:
+            for geo_version, path in [
+                (v["geo_version"], v.get("path")) for v in all_geo_versions
+            ]:
                 if geo_version == current_version:
                     # found the current version :)
-                    found_versions.append({"node": geo.name(), "type": "geo", "path": path})
+                    found_versions.append(
+                        {"node": geo.name(), "type": "geo", "path": path}
+                    )
                     break
-            
+
         return found_versions
 
     def update(self, items):
@@ -88,7 +93,7 @@ class MariSceneOperations(Hook):
     def _update_geometry_items(self, items):
         """
         Update specified geo items in the current project
-        
+
         :param items:    List of geometry items to update
         """
         mari_engine = self.parent.engine
@@ -102,38 +107,47 @@ class MariSceneOperations(Hook):
         all_paths = set([item["path"] for item in items])
         try:
             fields = ["id", "path", "version_number"]
-            found_publishes = sgtk.util.find_publish(self.parent.sgtk, all_paths, fields=fields)
-        except TankError, e:
+            found_publishes = sgtk.util.find_publish(
+                self.parent.sgtk, all_paths, fields=fields
+            )
+        except TankError as e:
             raise TankError("Failed to query publishes from Shotgun: %s" % e)
-        
+
         # now we have all the info we need to update geometry:
         for item in items:
             publish_path = item["path"]
             geo_name = item["node"]
-        
-            # find the publish details:    
+
+            # find the publish details:
             sg_publish_data = found_publishes.get(publish_path)
             if not sg_publish_data:
-                raise TankError("Failed to find Shotgun publish record for '%s'" % publish_path)
-            
+                raise TankError(
+                    "Failed to find Shotgun publish record for '%s'" % publish_path
+                )
+
             # find geo in project:
             geo = mari.geo.find(geo_name)
             if not geo:
-                raise TankError("Failed to find geometry '%s' in the current project" % geo_name)
-            
+                raise TankError(
+                    "Failed to find geometry '%s' in the current project" % geo_name
+                )
+
             # check to see if this version is already loaded:
             already_loaded = False
             all_geo_versions = mari_engine.list_geometry_versions(geo)
-            for geo_version, path in [(v["geo_version"], v.get("path")) for v in all_geo_versions]:
+            for geo_version, path in [
+                (v["geo_version"], v.get("path")) for v in all_geo_versions
+            ]:
                 if path == publish_path:
                     # we already have this version laoded so just set it as current:
                     geo.setCurrentVersion(geo_version.name())
                     already_loaded = True
                     break
-                    
+
             if not already_loaded:
                 # add the new version:
-                new_version = mari_engine.add_geometry_version(geo, sg_publish_data, options)
+                new_version = mari_engine.add_geometry_version(
+                    geo, sg_publish_data, options
+                )
                 if new_version:
                     geo.setCurrentVersion(new_version.name())
-

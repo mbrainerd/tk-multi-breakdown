@@ -9,8 +9,9 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 from breakdown import get_breakdown_items
 
+
 def show_dialog(app):
     # defer imports so that the app works gracefully in batch modes
     from .dialog import AppDialog
-    app.engine.show_dialog("Breakdown", app, AppDialog, app)
 
+    app.engine.show_dialog("Breakdown", app, AppDialog, app)

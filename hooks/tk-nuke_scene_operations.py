@@ -15,6 +15,7 @@ import sgtk
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
+
 class BreakdownSceneOperations(HookBaseClass):
     """
     Breakdown operations for Nuke.
@@ -42,7 +43,7 @@ class BreakdownSceneOperations(HookBaseClass):
         Toolkit will scan the list of items, see if any of the objects matches
         any templates and try to determine if there is a more recent version
         available. Any such versions are then displayed in the UI as out of date.
-    
+
         """
 
         reads = []
@@ -59,11 +60,7 @@ class BreakdownSceneOperations(HookBaseClass):
                     for file in files:
                         path = file.filename().replace("/", os.path.sep)
                         reads.append(
-                            dict(
-                                node=clip.activeItem(),
-                                type="Clip",
-                                path=path,
-                            )
+                            dict(node=clip.activeItem(), type="Clip", path=path,)
                         )
 
         # Hiero doesn't have nodes to check, so just return the clips.
@@ -77,26 +74,25 @@ class BreakdownSceneOperations(HookBaseClass):
 
             # note! We are getting the "abstract path", so contains
             # %04d and %V rather than actual values.
-            path = node.knob('file').value().replace("/", os.path.sep)
+            path = node.knob("file").value().replace("/", os.path.sep)
 
-            reads.append( {"node": node_name, "type": "Read", "path": path})
+            reads.append({"node": node_name, "type": "Read", "path": path})
 
-        # then the read geometry nodes    
+        # then the read geometry nodes
         for node in nuke.allNodes("ReadGeo2"):
             node_name = node.name()
-            
-            path = node.knob('file').value().replace("/", os.path.sep)
-            reads.append( {"node": node_name, "type": "ReadGeo2", "path": path})
-        
-        # then the read camera nodes    
+
+            path = node.knob("file").value().replace("/", os.path.sep)
+            reads.append({"node": node_name, "type": "ReadGeo2", "path": path})
+
+        # then the read camera nodes
         for node in nuke.allNodes("Camera2"):
             node_name = node.name()
-            
-            path = node.knob('file').value().replace("/", os.path.sep)
-            reads.append( {"node": node_name, "type": "Camera2", "path": path})
+
+            path = node.knob("file").value().replace("/", os.path.sep)
+            reads.append({"node": node_name, "type": "Camera2", "path": path})
 
         return reads
-
 
     def update(self, items):
         """
@@ -119,12 +115,15 @@ class BreakdownSceneOperations(HookBaseClass):
             new_path = i["path"].replace(os.path.sep, "/")
 
             if node_type in node_type_list:
-                engine.log_debug("Node %s: Updating to version %s" % (node_name, new_path))
+                engine.log_debug(
+                    "Node %s: Updating to version %s" % (node_name, new_path)
+                )
                 node = nuke.toNode(node_name)
                 node.knob("file").setValue(new_path)
 
             if node_type == "Clip":
-                engine.log_debug("Clip %s: Updating to version %s" % (node_name, new_path))
+                engine.log_debug(
+                    "Clip %s: Updating to version %s" % (node_name, new_path)
+                )
                 clip = node_name
                 clip.reconnectMedia(new_path)
-

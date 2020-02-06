@@ -24,6 +24,7 @@ browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_
 from .ui.item import Ui_Item
 from . import breakdown
 
+
 class BreakdownListItem(browser_widget.ListItem):
     """
     Custom list widget for displaying the breakdown status in the list view
@@ -66,7 +67,9 @@ class BreakdownListItem(browser_widget.ListItem):
         else:
             return self._is_latest == False
 
-    def calculate_status(self, template, fields, show_red, show_green, entity_dict = None):
+    def calculate_status(
+        self, template, fields, show_red, show_green, entity_dict=None
+    ):
         """
         Figure out if this is a red or a green one. Also get thumb if possible
         """
@@ -88,7 +91,7 @@ class BreakdownListItem(browser_widget.ListItem):
         # kick off the worker!
         self._worker_uid = self._worker.queue_work(self._calculate_status, {})
         self._worker.work_completed.connect(self._on_worker_task_complete)
-        self._worker.work_failure.connect( self._on_worker_failure)
+        self._worker.work_failure.connect(self._on_worker_failure)
 
     def _calculate_status(self, data):
         """
@@ -120,13 +123,14 @@ class BreakdownListItem(browser_widget.ListItem):
             else:
                 output["thumbnail"] = ":/res/no_thumb.png"
 
-
         # first, get the latest available version for this item
         app = tank.platform.current_bundle()
-        latest_version = app.execute_hook("hook_get_version_number", template=self._template, curr_fields=self._fields)
+        latest_version = app.execute_hook(
+            "hook_get_version_number", template=self._template, curr_fields=self._fields
+        )
 
         current_version = self._fields["version"]
-        output["up_to_date"] = (latest_version == current_version)
+        output["up_to_date"] = latest_version == current_version
 
         self._latest_version = latest_version
         self._is_latest = output["up_to_date"]
@@ -144,7 +148,6 @@ class BreakdownListItem(browser_widget.ListItem):
 
         # show error message
         self._app.log_warning("Worker error: %s" % msg)
-
 
     def _on_worker_task_complete(self, uid, data):
         """
