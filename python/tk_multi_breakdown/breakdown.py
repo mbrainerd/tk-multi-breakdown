@@ -97,7 +97,7 @@ def get_breakdown_items():
         # see if this read node matches any path in the templates setup
         matching_template = app.tank.template_from_path(file_name)
 
-        if matching_template:
+        if matching_template and 'work' not in matching_template.name:
 
             # see if we have a version number
             fields = matching_template.get_fields(file_name)
