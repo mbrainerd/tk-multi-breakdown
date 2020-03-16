@@ -8,19 +8,13 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import tank
-import os
-import sys
-import datetime
-import threading
-import tank
 
-from tank.platform.qt import QtCore, QtGui
+import sgtk
 
 from . import breakdown
 
-browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
-shotgun_globals = tank.platform.import_framework(
+browser_widget = sgtk.platform.import_framework("tk-framework-widget", "browser_widget")
+shotgun_globals = sgtk.platform.import_framework(
     "tk-framework-shotgunutils", "shotgun_globals"
 )
 
@@ -91,7 +85,7 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
         ################################################################################
         # PASS 2 - display the content of all groups
 
-        if tank.util.get_published_file_entity_type(self._app.tank) == "PublishedFile":
+        if sgtk.util.get_published_file_entity_type(self._app.sgtk) == "PublishedFile":
             published_file_type_field = "published_file_type"
         else:  # == "TankPublishedFile"
             published_file_type_field = "tank_type"

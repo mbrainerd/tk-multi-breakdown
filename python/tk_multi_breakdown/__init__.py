@@ -7,7 +7,9 @@
 # By accessing, using, copying or modifying this work you indicate your
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
-from breakdown import get_breakdown_items
+
+# Import the get_breakdown_items() method so that it can be used in the app.py.
+from .breakdown import get_breakdown_items  # noqa
 
 
 def show_dialog(app):

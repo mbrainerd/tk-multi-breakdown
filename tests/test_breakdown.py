@@ -8,18 +8,11 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sys
 import os
-import shutil
-import tempfile
 
 from tank_test.tank_test_base import *
-import tank
-from tank.errors import TankError
-from tank.platform import application
-from tank.platform import constants
-from tank.template import Template
-from tank.deploy import descriptor
+import sgtk
+from sgtk.errors import TankError
 
 
 class TestApplication(TankTestBase):
@@ -91,14 +84,14 @@ class TestApplication(TankTestBase):
         context = self.tk.context_from_entity(self.shot["type"], self.shot["id"])
 
         # and start the engine
-        self.engine = tank.platform.start_engine("test_engine", self.tk, context)
+        self.engine = sgtk.platform.start_engine("test_engine", self.tk, context)
 
     def tearDown(self):
         """
         Fixtures teardown
         """
         # engine is held as global, so must be destroyed.
-        cur_engine = tank.platform.current_engine()
+        cur_engine = sgtk.platform.current_engine()
         if cur_engine:
             cur_engine.destroy()
 
@@ -209,7 +202,7 @@ class TestApi(TestApplication):
         fields["version"] = 4
 
         # clear temp location where hook writes to
-        tank._hook_items = None
+        sgtk._hook_items = None
 
         # execute hook
         self.app.update_item(
@@ -217,7 +210,7 @@ class TestApi(TestApplication):
         )
 
         # check result
-        self.assertEqual(len(tank._hook_items), 1)
-        self.assertEqual(tank._hook_items[0]["node"], "maya_publish")
-        self.assertEqual(tank._hook_items[0]["path"], self.test_path_2)
-        self.assertEqual(tank._hook_items[0]["type"], "TestNode")
+        self.assertEqual(len(sgtk._hook_items), 1)
+        self.assertEqual(sgtk._hook_items[0]["node"], "maya_publish")
+        self.assertEqual(sgtk._hook_items[0]["path"], self.test_path_2)
+        self.assertEqual(sgtk._hook_items[0]["type"], "TestNode")

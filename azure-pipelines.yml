@@ -30,3 +30,8 @@ variables:
 # Launch into the build pipeline.
 jobs:
 - template: build-pipeline.yml@templates
+  parameters:
+    additional_repositories:
+      - name: tk-framework-shotgunutils
+      - name: tk-framework-widget
+      - name: tk-framework-qtwidgets

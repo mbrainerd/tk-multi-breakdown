@@ -8,13 +8,9 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import tank
 import copy
-import os
-import sys
-import threading
 
-from tank.platform.qt import QtCore, QtGui
+from sgtk.platform.qt import QtGui
 from .ui.dialog import Ui_Dialog
 
 

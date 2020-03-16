@@ -8,21 +8,13 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import urlparse
-import os
-import urllib
-import shutil
-import sys
-import tank
 
-from tank import TankError
+import sgtk
+from sgtk.platform.qt import QtGui
 
-from tank.platform.qt import QtCore, QtGui
-
-browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
+browser_widget = sgtk.platform.import_framework("tk-framework-widget", "browser_widget")
 
 from .ui.item import Ui_Item
-from . import breakdown
 
 
 class BreakdownListItem(browser_widget.ListItem):
@@ -124,7 +116,7 @@ class BreakdownListItem(browser_widget.ListItem):
                 output["thumbnail"] = ":/res/no_thumb.png"
 
         # first, get the latest available version for this item
-        app = tank.platform.current_bundle()
+        app = sgtk.platform.current_bundle()
         latest_version = app.execute_hook(
             "hook_get_version_number", template=self._template, curr_fields=self._fields
         )

@@ -12,10 +12,7 @@
 A breakdown app which shows what in the scene is out of date.
 """
 
-from tank.platform import Application
-
-import sys
-import os
+from sgtk.platform import Application
 
 
 class MultiBreakdown(Application):

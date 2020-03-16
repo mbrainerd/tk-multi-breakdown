@@ -8,14 +8,8 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import urlparse
 import os
-import urllib
-import shutil
-import sys
-import tank
-
-from tank import TankError
+import sgtk
 
 # cache the publish data we pull down from shotgun for performance
 g_cached_sg_publish_data = {}
@@ -83,7 +77,7 @@ def get_breakdown_items():
 
     # perform the scene scanning in the main UI thread - a lot of apps are sensitive to these
     # types of operations happening in other threads.
-    app = tank.platform.current_bundle()
+    app = sgtk.platform.current_bundle()
     scene_objects = app.engine.execute_in_main_thread(
         app.execute_hook_method, "hook_scene_operations", "scan_scene"
     )
@@ -97,7 +91,7 @@ def get_breakdown_items():
         file_name = scene_object.get("path").replace("/", os.path.sep)
 
         # see if this read node matches any path in the templates setup
-        matching_template = app.tank.template_from_path(file_name)
+        matching_template = app.sgtk.template_from_path(file_name)
 
         if matching_template:
 
@@ -111,7 +105,7 @@ def get_breakdown_items():
                 # remove all abstract fields from keys so that the default value will get used
                 # when building a path from the template.  This is consistent with the utility
                 # method 'register_publish'
-                for key_name, key in matching_template.keys.iteritems():
+                for key_name, key in matching_template.keys.items():
                     if key_name in fields and key.is_abstract:
                         del fields[key_name]
 
@@ -162,12 +156,12 @@ def get_breakdown_items():
         "project",
     ]
 
-    if tank.util.get_published_file_entity_type(app.tank) == "PublishedFile":
+    if sgtk.util.get_published_file_entity_type(app.sgtk) == "PublishedFile":
         fields.append("published_file_type")
     else:  # == "TankPublishedFile"
         fields.append("tank_type")
 
-    sg_data = tank.util.find_publish(app.tank, paths_to_fetch, fields=fields)
+    sg_data = sgtk.util.find_publish(app.sgtk, paths_to_fetch, fields=fields)
 
     # process and cache shotgun items
     for (path, sg_chunk) in sg_data.items():

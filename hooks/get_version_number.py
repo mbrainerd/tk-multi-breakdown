@@ -47,7 +47,7 @@ class GetVersionNumber(HookBaseClass):
 
         # first, find all abstract (Sequence) keys from the template:
         abstract_keys = set()
-        for key_name, key in template.keys.iteritems():
+        for key_name, key in template.keys.items():
             if key.is_abstract:
                 abstract_keys.add(key_name)
 
