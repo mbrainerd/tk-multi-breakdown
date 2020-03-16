@@ -8,9 +8,8 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from tank import Hook
+from sgtk import Hook
 import maya.cmds as cmds
-import pymel.core as pm
 import os
 
 
@@ -45,12 +44,12 @@ class BreakdownSceneOperations(Hook):
         refs = []
 
         # first let's look at maya references
-        for x in pm.listReferences():
-            node_name = x.refNode.longName()
+        for ref in cmds.file(q=1, reference=1):
+            node_name = cmds.referenceQuery(ref, referenceNode=1)
 
             # get the path and make it platform dependent
             # (maya uses C:/style/paths)
-            maya_path = x.path.replace("/", os.path.sep)
+            maya_path = ref.replace("/", os.path.sep)
             refs.append({"node": node_name, "type": "reference", "path": maya_path})
 
         # now look at file texture nodes
@@ -94,8 +93,7 @@ class BreakdownSceneOperations(Hook):
                 engine.log_debug(
                     "Maya Reference %s: Updating to version %s" % (node, new_path)
                 )
-                rn = pm.system.FileReference(node)
-                rn.replaceWith(new_path)
+                cmds.file(new_path, loadReference=node)
 
             elif node_type == "file":
                 # file texture node
