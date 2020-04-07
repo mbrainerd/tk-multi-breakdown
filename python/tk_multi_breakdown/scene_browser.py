@@ -10,8 +10,9 @@
 
 
 import sgtk
-
+from sgtk.platform.qt import QtCore
 from . import breakdown
+
 
 browser_widget = sgtk.platform.import_framework("tk-framework-widget", "browser_widget")
 shotgun_globals = sgtk.platform.import_framework(
@@ -22,6 +23,10 @@ from .breakdown_list_item import BreakdownListItem
 
 
 class SceneBrowserWidget(browser_widget.BrowserWidget):
+
+    _item_work_completed = QtCore.Signal(str, object)
+    _item_work_failed = QtCore.Signal(str, str)
+
     def __init__(self, parent=None):
         browser_widget.BrowserWidget.__init__(self, parent)
 
@@ -37,6 +42,17 @@ class SceneBrowserWidget(browser_widget.BrowserWidget):
         return "<tr><td><b>%s</b>&nbsp;&nbsp;&nbsp;</td><td>%s</td></tr>" % (
             first,
             second,
+        )
+
+    def set_app(self, app):
+        browser_widget.BrowserWidget.set_app(self, app)
+        # For some reason connecting the worker signal directly to the child items' slots causes a
+        # segmentation fault when there are many items. But re-emitting a local signal works fine
+        self._worker.work_completed.connect(
+            lambda uid, data: self._item_work_completed.emit(uid, data)
+        )
+        self._worker.work_failure.connect(
+            lambda uid, msg: self._item_work_failed.emit(uid, msg)
         )
 
     def process_result(self, result):

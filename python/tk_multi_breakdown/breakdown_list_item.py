@@ -32,6 +32,7 @@ class BreakdownListItem(browser_widget.ListItem):
         self._red_pixmap = QtGui.QPixmap(":/res/red_bullet.png")
         self._latest_version = None
         self._is_latest = None
+        self._browser = parent
 
     def _setup_ui(self):
         """
@@ -81,9 +82,9 @@ class BreakdownListItem(browser_widget.ListItem):
         self._sg_data = entity_dict
 
         # kick off the worker!
+        self._browser._item_work_completed.connect(self._on_worker_task_complete)
+        self._browser._item_work_failed.connect(self._on_worker_failure)
         self._worker_uid = self._worker.queue_work(self._calculate_status, {})
-        self._worker.work_completed.connect(self._on_worker_task_complete)
-        self._worker.work_failure.connect(self._on_worker_failure)
 
     def _calculate_status(self, data):
         """
