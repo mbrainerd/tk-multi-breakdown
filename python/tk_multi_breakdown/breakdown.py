@@ -8,20 +8,15 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import urlparse
 import os
-import urllib
-import shutil
-import sys
-import tank
-
-from tank import TankError
+import sgtk
 
 # cache the publish data we pull down from shotgun for performance
 g_cached_sg_publish_data = {}
 
 # the template key we use to find the version number
 VERSION_KEY = "version"
+
 
 def get_breakdown_items():
     """
@@ -82,11 +77,12 @@ def get_breakdown_items():
 
     # perform the scene scanning in the main UI thread - a lot of apps are sensitive to these
     # types of operations happening in other threads.
-    app = tank.platform.current_bundle()
-    scene_objects = app.engine.execute_in_main_thread(app.execute_hook_method, "hook_scene_operations", "scan_scene")
+    app = sgtk.platform.current_bundle()
+    scene_objects = app.engine.execute_in_main_thread(
+        app.execute_hook_method, "hook_scene_operations", "scan_scene"
+    )
     # returns a list of dictionaries, each dict being like this:
     # {"node": node_name, "type": "reference", "path": maya_path}
-
 
     for scene_object in scene_objects:
 
@@ -95,7 +91,7 @@ def get_breakdown_items():
         file_name = scene_object.get("path").replace("/", os.path.sep)
 
         # see if this read node matches any path in the templates setup
-        matching_template = app.tank.template_from_path(file_name)
+        matching_template = app.sgtk.template_from_path(file_name)
 
         if matching_template:
 
@@ -109,9 +105,9 @@ def get_breakdown_items():
                 # remove all abstract fields from keys so that the default value will get used
                 # when building a path from the template.  This is consistent with the utility
                 # method 'register_publish'
-                for key_name, key in matching_template.keys.iteritems():
+                for key_name, key in matching_template.keys.items():
                     if key_name in fields and key.is_abstract:
-                        del(fields[key_name])
+                        del fields[key_name]
 
                 # we also want to normalize the eye field (this should probably be an abstract field!)
                 # note: we need to do this explicitly because the eye isn't abstract in the default
@@ -129,7 +125,6 @@ def get_breakdown_items():
                 item["fields"] = fields
                 item["sg_data"] = None
 
-
                 # store the normalized fields in dict
                 items.append(item)
 
@@ -137,7 +132,7 @@ def get_breakdown_items():
     # note that we store (by convention) all things on a normalized sequence form in SG, e.g
     # all four-padded sequences are stored as '%04d' regardless if they have been published from
     # houdini, maya, nuke etc.
-    valid_paths = [ x.get("path") for x in items ]
+    valid_paths = [x.get("path") for x in items]
 
     # check if we have the path in the cache
     paths_to_fetch = []
@@ -150,25 +145,23 @@ def get_breakdown_items():
                 if item.get("path") == p:
                     item["sg_data"] = g_cached_sg_publish_data[p]
 
+    fields = [
+        "entity",
+        "entity.Asset.sg_asset_type",  # grab asset type if it is an asset
+        "code",
+        "image",
+        "name",
+        "task",
+        "version_number",
+        "project",
+    ]
 
-    fields = ["entity",
-              "entity.Asset.sg_asset_type", # grab asset type if it is an asset
-              "code",
-              "image",
-              "name",
-              "task",
-              "version_number",
-              "project"
-              ]
-    # add the additional publish fields to query.
-    fields = fields + app.get_setting('additional_publish_fields')
-
-    if tank.util.get_published_file_entity_type(app.tank) == "PublishedFile":
+    if sgtk.util.get_published_file_entity_type(app.sgtk) == "PublishedFile":
         fields.append("published_file_type")
-    else:# == "TankPublishedFile"
+    else:  # == "TankPublishedFile"
         fields.append("tank_type")
 
-    sg_data = tank.util.find_publish(app.tank, paths_to_fetch, fields=fields)
+    sg_data = sgtk.util.find_publish(app.sgtk, paths_to_fetch, fields=fields)
 
     # process and cache shotgun items
     for (path, sg_chunk) in sg_data.items():

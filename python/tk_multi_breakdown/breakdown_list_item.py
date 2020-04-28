@@ -8,21 +8,14 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import urlparse
-import os
-import urllib
-import shutil
-import sys
-import tank
 
-from tank import TankError
+import sgtk
+from sgtk.platform.qt import QtGui
 
-from tank.platform.qt import QtCore, QtGui
-
-browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
+browser_widget = sgtk.platform.import_framework("tk-framework-widget", "browser_widget")
 
 from .ui.item import Ui_Item
-from . import breakdown
+
 
 class BreakdownListItem(browser_widget.ListItem):
     """
@@ -39,6 +32,7 @@ class BreakdownListItem(browser_widget.ListItem):
         self._red_pixmap = QtGui.QPixmap(":/res/red_bullet.png")
         self._latest_version = None
         self._is_latest = None
+        self._browser = parent
 
     def _setup_ui(self):
         """
@@ -66,7 +60,9 @@ class BreakdownListItem(browser_widget.ListItem):
         else:
             return self._is_latest == False
 
-    def calculate_status(self, template, fields, show_red, show_green, entity_dict = None):
+    def calculate_status(
+        self, template, fields, show_red, show_green, entity_dict=None
+    ):
         """
         Figure out if this is a red or a green one. Also get thumb if possible
         """
@@ -86,9 +82,9 @@ class BreakdownListItem(browser_widget.ListItem):
         self._sg_data = entity_dict
 
         # kick off the worker!
+        self._browser._item_work_completed.connect(self._on_worker_task_complete)
+        self._browser._item_work_failed.connect(self._on_worker_failure)
         self._worker_uid = self._worker.queue_work(self._calculate_status, {})
-        self._worker.work_completed.connect(self._on_worker_task_complete)
-        self._worker.work_failure.connect( self._on_worker_failure)
 
     def _calculate_status(self, data):
         """
@@ -120,13 +116,14 @@ class BreakdownListItem(browser_widget.ListItem):
             else:
                 output["thumbnail"] = ":/res/no_thumb.png"
 
-
         # first, get the latest available version for this item
-        app = tank.platform.current_bundle()
-        latest_version = app.execute_hook("hook_get_version_number", template=self._template, curr_fields=self._fields)
+        app = sgtk.platform.current_bundle()
+        latest_version = app.execute_hook(
+            "hook_get_version_number", template=self._template, curr_fields=self._fields
+        )
 
         current_version = self._fields["version"]
-        output["up_to_date"] = (latest_version == current_version)
+        output["up_to_date"] = latest_version == current_version
 
         self._latest_version = latest_version
         self._is_latest = output["up_to_date"]
@@ -144,7 +141,6 @@ class BreakdownListItem(browser_widget.ListItem):
 
         # show error message
         self._app.log_warning("Worker error: %s" % msg)
-
 
     def _on_worker_task_complete(self, uid, data):
         """

@@ -14,6 +14,7 @@ from tank import Hook
 
 import hou
 
+
 class BreakdownSceneOperations(Hook):
     """
     Breakdown operations for Houdini.
@@ -45,8 +46,7 @@ class BreakdownSceneOperations(Hook):
         items = []
 
         # get a list of all regular lembic nodes in the file
-        alembic_nodes = hou.nodeType(hou.sopNodeTypeCategory(),
-            "alembic").instances()
+        alembic_nodes = hou.nodeType(hou.sopNodeTypeCategory(), "alembic").instances()
 
         # return an item for each alembic node found. the breakdown app will check
         # the paths of each looking for a template match and a newer version.
@@ -55,11 +55,9 @@ class BreakdownSceneOperations(Hook):
             file_parm = alembic_node.parm("fileName")
             file_path = os.path.normpath(file_parm.eval())
 
-            items.append({
-                "node": alembic_node.path(),
-                "type": "alembic",
-                "path": file_path,
-            })
+            items.append(
+                {"node": alembic_node.path(), "type": "alembic", "path": file_path}
+            )
 
         return items
 
@@ -92,6 +90,6 @@ class BreakdownSceneOperations(Hook):
 
                 alembic_node = hou.node(node_path)
                 engine.log_debug(
-                    "Updating alembic node '%s' to: %s" % (node_path, file_path))
+                    "Updating alembic node '%s' to: %s" % (node_path, file_path)
+                )
                 alembic_node.parm("fileName").set(file_path)
-
